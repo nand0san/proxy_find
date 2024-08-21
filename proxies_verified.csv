@@ -1,0 +1,29 @@
+host,port,country,anonymity,https,last_checked,extraction_date,response_time,detected_ip,is_working,avg_response_time
+35.185.196.38,3128,United States,anonymous,yes,10 mins ago,2024-08-21 13:01:54,1.15,"10.0.0.73, 34.168.217.206",Yes,0.45
+79.175.189.223,1080,Iran,elite proxy,yes,1 min ago,2024-08-21 13:01:54,1.16,79.175.189.223,Yes,1.14
+15.204.161.192,18080,United States,elite proxy,yes,19 secs ago,2024-08-21 13:01:54,0.77,77.111.247.62,Yes,1.52
+181.188.27.162,8080,Trinidad and Tobago,elite proxy,yes,1 min ago,2024-08-21 13:01:54,7.91,181.188.27.162,Yes,3.35
+189.240.60.168,9090,Mexico,elite proxy,yes,1 min ago,2024-08-21 13:01:54,3.55,189.240.60.168,Yes,4.31
+47.251.43.115,33333,United States,anonymous,yes,1 min ago,2024-08-21 13:01:54,12.92,47.251.43.115,Yes,4.61
+189.240.60.163,9090,Mexico,elite proxy,yes,19 secs ago,2024-08-21 13:01:54,3.69,189.240.60.168,Yes,4.80
+160.86.242.23,8080,Japan,elite proxy,no,10 mins ago,2024-08-21 13:01:54,4.16,160.86.242.23,Yes,6.70
+163.5.196.217,8081,Netherlands,anonymous,no,1 min ago,2024-08-21 13:01:54,0.33,163.5.196.217,No,0.21
+68.178.203.69,8899,United States,anonymous,no,1 min ago,2024-08-21 13:01:54,0.51,N/A,No,N/A
+20.24.43.214,80,Singapore,elite proxy,no,1 min ago,2024-08-21 13:01:54,0.56,20.24.43.214,No,0.20
+162.223.90.130,80,United States,elite proxy,no,1 min ago,2024-08-21 13:01:54,0.35,162.223.90.130,No,0.27
+47.56.110.204,8989,Hong Kong,anonymous,no,1 min ago,2024-08-21 13:01:54,1.89,N/A,No,N/A
+97.74.87.226,80,Singapore,anonymous,no,1 min ago,2024-08-21 13:01:54,1.05,N/A,No,N/A
+47.74.152.29,8888,Singapore,anonymous,no,10 mins ago,2024-08-21 13:01:54,5.17,"httpbin.org, 47.74.152.29",No,0.27
+198.49.68.80,80,United States,elite proxy,no,20 mins ago,2024-08-21 13:01:54,3.54,198.49.68.79,No,1.12
+198.74.51.79,8888,United States,anonymous,no,10 mins ago,2024-08-21 13:01:54,8.67,198.74.51.79,No,0.32
+190.103.177.131,80,Argentina,anonymous,no,1 min ago,2024-08-21 13:01:54,0.97,190.103.177.131,No,1.06
+93.177.67.178,80,Germany,anonymous,no,1 min ago,2024-08-21 13:01:54,7.65,93.177.67.178,No,0.69
+74.208.245.106,8888,United States,anonymous,no,1 min ago,2024-08-21 13:01:54,0.35,N/A,No,N/A
+164.163.185.199,80,Peru,elite proxy,no,20 mins ago,2024-08-21 13:01:54,12.33,164.163.185.202,No,1.37
+8.219.97.248,80,Singapore,anonymous,no,1 min ago,2024-08-21 13:01:54,0.80,8.219.64.236,No,0.32
+181.41.194.186,80,Netherlands,anonymous,no,1 min ago,2024-08-21 13:01:54,6.12,N/A,No,N/A
+37.27.198.141,80,Finland,elite proxy,no,1 min ago,2024-08-21 13:01:54,1.43,N/A,No,N/A
+219.65.73.81,80,India,anonymous,no,1 min ago,2024-08-21 13:01:54,0.93,N/A,No,N/A
+47.90.205.231,33333,United States,anonymous,no,1 min ago,2024-08-21 13:01:54,10.08,47.90.205.231,No,2.77
+117.54.114.97,80,Indonesia,anonymous,no,1 min ago,2024-08-21 13:01:54,0.90,N/A,No,N/A
+192.73.244.36,80,United States,elite proxy,no,1 min ago,2024-08-21 13:01:54,2.90,192.73.244.36,No,4.53

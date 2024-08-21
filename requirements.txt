@@ -1,0 +1,4 @@
+requests~=2.32.3
+urllib3~=2.2.2
+BeautifulSoup4~=4.12.3
+aiohttp~=3.10.5
