@@ -4,12 +4,17 @@ import time
 from collections import namedtuple
 from requests.exceptions import RequestException
 import urllib3
-import concurrent.futures
+import argparse
 
 # Desactivar advertencias de SSL inseguro
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 ProxyTest = namedtuple('ProxyTest', ['url', 'validation_method'])
+
+
+def validate_url(response, url_string: str) -> bool:
+    """Verify that expected url is in response text."""
+    return url_string in response.text.lower()
 
 
 def validate_ip_response(response):
@@ -20,17 +25,6 @@ def validate_ip_response(response):
         return len(response.text.strip()) < 50  # Asumimos que es una IP si es un texto corto
 
 
-def validate_google(response):
-    return '<title>Google</title>' in response.text
-
-
-PROXY_TESTS = [
-    ProxyTest('http://httpbin.org/ip', validate_ip_response),
-    ProxyTest('https://api.ipify.org', validate_ip_response),
-    ProxyTest('https://www.google.com', validate_google)
-]
-
-
 def extract_ip(response):
     try:
         json_response = response.json()
@@ -39,20 +33,20 @@ def extract_ip(response):
         return response.text.strip() if len(response.text.strip()) < 50 else None
 
 
-def test_proxy(proxy, timeout=10):
+def test_proxy(proxy, tests, timeout=5):
     proxy_url = f"http://{proxy['host']}:{proxy['port']}"
     proxies = {"http": proxy_url, "https": proxy_url}
     results = []
     detected_ip = None
 
-    for test in PROXY_TESTS:
+    for test in tests:
         try:
             start_time = time.time()
             response = requests.get(test.url, proxies=proxies, timeout=timeout, verify=False)
             end_time = time.time()
 
             if response.status_code == 200 and test.validation_method(response):
-                if not detected_ip:
+                if not detected_ip and test.url in ['http://httpbin.org/ip', 'https://api.ipify.org']:
                     detected_ip = extract_ip(response)
                 results.append((True, end_time - start_time))
             else:
@@ -66,11 +60,12 @@ def test_proxy(proxy, timeout=10):
     proxy['is_working'] = 'Yes' if success_rate >= 0.5 else 'No'
     proxy['detected_ip'] = detected_ip if detected_ip else "N/A"
     proxy['avg_response_time'] = f"{avg_response_time:.2f}" if avg_response_time else "N/A"
+    proxy['test_results'] = {test.url: 'Pass' if result[0] else 'Fail' for test, result in zip(tests, results)}
 
     return proxy
 
 
-def main():
+def main(tests):
     proxies = []
     with open('proxies_working.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -80,24 +75,25 @@ def main():
 
     print(f"Cargados {len(proxies)} proxies para verificación.")
 
-    # Usar ThreadPoolExecutor para probar los proxies en paralelo
-    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
-        future_to_proxy = {executor.submit(test_proxy, proxy): proxy for proxy in proxies}
+    tested_proxies = []
+    for i, proxy in enumerate(proxies, 1):
+        print(f"Probando proxy {i}/{len(proxies)}: {proxy['host']}:{proxy['port']}...", end='', flush=True)
+        tested_proxy = test_proxy(proxy, tests)
+        tested_proxies.append(tested_proxy)
 
-        tested_proxies = []
-        for future in concurrent.futures.as_completed(future_to_proxy):
-            proxy = future.result()
-            tested_proxies.append(proxy)
-
-            if proxy['is_working'] == 'Yes':
-                print(f"Proxy funcionando: {proxy['host']}:{proxy['port']} - Tiempo: {proxy['avg_response_time']}s - IP: {proxy['detected_ip']}")
+        if tested_proxy['is_working'] == 'Yes':
+            print(f" Funcionando - Tiempo: {tested_proxy['avg_response_time']}s - IP: {tested_proxy['detected_ip']}")
+            for url, result in tested_proxy['test_results'].items():
+                print(f"  {url}: {result}")
+        else:
+            print(" No funciona")
 
     # Ordenar proxies por tiempo de respuesta (solo los que funcionan)
     working_proxies = [p for p in tested_proxies if p['is_working'] == 'Yes']
     working_proxies.sort(key=lambda x: float(x['avg_response_time']))
 
     # Asegurarnos de que tenemos todos los campos necesarios
-    output_fieldnames = fieldnames + ['is_working', 'detected_ip', 'avg_response_time']
+    output_fieldnames = fieldnames + ['is_working', 'detected_ip', 'avg_response_time'] + [f"test_{url}" for url, _ in tests]
     output_fieldnames = list(dict.fromkeys(output_fieldnames))  # Eliminar duplicados si los hay
 
     # Escribir resultados en un nuevo archivo CSV
@@ -106,14 +102,46 @@ def main():
 
         writer.writeheader()
         for proxy in working_proxies + [p for p in tested_proxies if p['is_working'] == 'No']:
-            writer.writerow(proxy)
+            row = proxy.copy()
+            for url, result in proxy['test_results'].items():
+                row[f"test_{url}"] = result
+            del row['test_results']
+            writer.writerow(row)
 
     print("\nResultados guardados en 'proxies_verified.csv'")
 
     print(f"\nProxies funcionando: {len(working_proxies)}/{len(tested_proxies)}")
     for proxy in working_proxies[:10]:  # Mostrar solo los 10 mejores
         print(f"{proxy['host']}:{proxy['port']} ({proxy['country']}) - Anónimo: {proxy['anonymity']}, HTTPS: {proxy['https']}, Tiempo: {proxy['avg_response_time']}s")
+        for url, result in proxy['test_results'].items():
+            print(f"  {url}: {result}")
 
 
 if __name__ == "__main__":
-    main()
+    # Definir los tests predeterminados
+    DEFAULT_TESTS = [
+        ProxyTest('http://httpbin.org/ip', validate_ip_response),
+        ProxyTest('https://api.ipify.org', validate_ip_response),
+        ProxyTest('https://www.google.com', lambda r: validate_url(r, 'google'))
+    ]
+
+    # Para añadir un nuevo test personalizado, simplemente agrega una nueva entrada a DEFAULT_TESTS.
+    # Por ejemplo:
+    # DEFAULT_TESTS.append(ProxyTest('https://example.com', lambda r: validate_url(r, 'example')))
+
+    # Configurar el parser de argumentos
+    parser = argparse.ArgumentParser(description='Test proxies with optional target URL.')
+    parser.add_argument('--target', help='Target URL to test')
+
+    args = parser.parse_args()
+
+    # Determinar qué tests usar
+    if args.target:
+        tests = [ProxyTest(args.target, lambda r: validate_url(r, args.target.split('//')[1]))]
+        print(f"Probando proxies con URL objetivo: {args.target}")
+    else:
+        tests = DEFAULT_TESTS
+        print("Probando proxies con tests predeterminados")
+
+    # Ejecutar el programa principal
+    main(tests)
