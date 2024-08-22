@@ -101,3 +101,5 @@ old/
 .idea/
 !README.md
 !requirements.txt
+/proxies_verified.csv
+/proxies_working.csv
