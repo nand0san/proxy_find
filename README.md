@@ -2,8 +2,8 @@
 
 This repository contains two Python scripts for finding and testing HTTP proxies:
 
-1. `proxie_finder.py`: Extracts free proxies from a public list and performs initial tests.
-2. `proxie_test.py`: Conducts advanced tests on the extracted proxies.
+1. `proxie_finder.py`: Extracts free proxies from a public list and tests alive proxies.
+2. `proxie_test.py`: Checks if a specific url can be reached through the found proxies. Useful to detect proxy blocking by WAF.
 
 Repository: [https://github.com/nand0san/proxy_find](https://github.com/nand0san/proxy_find)
 
@@ -46,12 +46,12 @@ python proxie_finder.py
 
 This script will:
 - Scrape free proxies from https://free-proxy-list.net/
-- Perform initial tests on each proxy
+- Test if the proxies respond and allow web browsing.
 - Save working proxies to `proxies_working.csv`
 
 ### Advanced Proxy Tester
 
-After running the finder, use the advanced tester to further verify the proxies:
+After running the finder, use the advanced tester to further verify the proxies. Specifically useful in case of testing proxy blocks by WAFs, firewalls, etc.
 
 1. For default tests:
    ```
@@ -65,7 +65,7 @@ After running the finder, use the advanced tester to further verify the proxies:
 
 This script will:
 - Read proxies from `proxies_working.csv`
-- Perform advanced tests on each proxy (either default tests or against the specified target URL)
+- Perform navigation test trough found proxies against the specified target URL.
 - Provide real-time feedback on the testing progress
 - Save verified proxies to `proxies_verified.csv`
 
